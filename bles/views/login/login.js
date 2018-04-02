@@ -43,10 +43,7 @@ export default class Login extends Component {
         return (
             <View style={styles.view}>
                 {/* <StatusBar style={{height:30}}/> */}
-                <View style={{ flexDirection: 'row',justifyContent: 'space-between'}}>
-                    <Text>版本号：{this.state.versions}</Text>
-                    <Text>icon</Text>
-                </View>
+               
                 <View style={styles.header}>
                     <Image
                     style={styles.headerImage}
@@ -71,6 +68,9 @@ export default class Login extends Component {
                         <Item extra={State.height}  >高程</Item>
                     </List>
                 </View>
+                <View style={{ flexDirection: 'row',justifyContent: 'center',position:'absolute',bottom:0,width:375}}>
+                    <Text>版本号：{this.state.versions}</Text>
+                </View>
             </View>
         )
     }
@@ -78,6 +78,7 @@ export default class Login extends Component {
 const styles = StyleSheet.create({
     view: {
         paddingTop: 20,
+        flex:1
 
     },
     rowTitle: {

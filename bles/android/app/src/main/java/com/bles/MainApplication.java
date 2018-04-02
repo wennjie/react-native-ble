@@ -1,4 +1,4 @@
-package com.ble;
+package com.bles;
 
 import android.app.Application;
 

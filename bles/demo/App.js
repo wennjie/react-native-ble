@@ -17,14 +17,8 @@ import {
   Alert
 } from 'react-native';
 import BleManager from 'react-native-ble-manager';
-import { stringToBytes } from 'convert-string';
+import { stringToBytes ,bytesToString} from 'convert-string';
 
-import {Buffer} from 'buffer';
-console.log(Buffer)
-// // var toBuffer = require('typedarray-to-buffer')
-//  console.log(stringToBytes('$'))
-// var arr = new Int32Array(['$', 2, '@'])
-// console.log( (arr))
 
 
 const window = Dimensions.get('window');
@@ -55,6 +49,17 @@ export default class Demo extends Component {
   }
 
   componentDidMount() {
+    BleManager.enableBluetooth()
+    .then(() => {
+      // Success code
+      console.log('The bluetooh is already enabled or the user confirm');
+    })
+    .catch((error) => {
+      // Failure code
+      console.log('The user refuse to enable bluetooth');
+    });
+
+
     AppState.addEventListener('change', this.handleAppStateChange);
 
     BleManager.start({ showAlert: false }).then((e) => {
@@ -114,8 +119,9 @@ export default class Demo extends Component {
     console.log('断开了 ' + data.peripheral);
   }
 
-  handleUpdateValueForCharacteristic(data) {
-    console.log('来信的数据 ' + data.peripheral + ' 特征 ' + data.characteristic, data.value);
+  handleUpdateValueForCharacteristic(data) { //监听返回的值
+    // console.log('来信的数据 ' + data.peripheral + ' 特征 ' + data.characteristic, data.value);
+    console.log(bytesToString(data.value))
   }
 
   handleStopScan() {
@@ -134,8 +140,8 @@ export default class Demo extends Component {
       });
   }
   startScan() {
-  
-    // return
+
+
     if (!this.state.scanning) {
       this.setState({ peripherals: new Map() });
       BleManager.scan([], 5, true).then((results) => {
@@ -205,56 +211,57 @@ export default class Demo extends Component {
             BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
               console.log(`搜索到的服务`);
               console.log(peripheralInfo)
-              // let gga = 0;
-              // gga |= (1 << 3);
-              // let  bggas = Int2Byte.bytesCopy(gga, 0, 0);
-              // [,0,0]
-              let int32 = new Int32Array(30)
-              int32[3] = 1
+
+
+              let int32 = new Int32Array(14)
+              int32[0] = 16
               let data = [...stringToBytes('#'),...int32,...stringToBytes('@')]
-              // console.log(data)
-
-              // let int32 = new Int32Array(34)
-              // int32[3] = 1
-              // int32[0]=stringToBytes('$')
-              // int32[33]=stringToBytes('@')
-              // console.log(int32)
-
-// let int32=new Uint32Array(32)
-// console.log(int32)
+              console.log(data)
               let characteristics = peripheralInfo.characteristics  //特征
-
+              
               let pId = peripheralInfo.id
               characteristics.map((i) => {
                 if (i.characteristic == '1111') {
-                  console.log(i)
-                  // return
-                  BleManager.write(pId, i.service, i.characteristic, data)
+                  // setTimeout(()=>{
+                  //   BleManager.read(pId,i.service, i.characteristic)
+                  //   .then((readData) => {
+                  //     // Success code
+                  //     console.log('Read: ' + readData+ '__'+ readData.length);
+
+                  //     // const buffer = Buffer.Buffer.from(readData);    //https://github.com/feross/buffer#convert-arraybuffer-to-buffer
+                  //     // const sensorData = buffer.readUInt8(1, true);
+                  //   })
+                  //   .catch((error) => {
+                  //     // Failure code
+                  //     console.log(error);
+                  //   });
+                  // },500)
+                  BleManager.write(pId,i.service, i.characteristic, data)
                     .then((res) => {
                       // Success code
-                      console.log('Write: ' + data)
+                      console.log('Write: ' + data);
 
 
-                      setTimeout(() => {
-                        BleManager.read(pId, i.service, i.characteristic)
-                          .then((readData) => {
-                            // Success code
-                            console.log('Read: ' + readData + '__' + readData.length);
-
-                            // const buffer = Buffer.Buffer.from(readData);    //https://github.com/feross/buffer#convert-arraybuffer-to-buffer
-                            // const sensorData = buffer.readUInt8(1, true);
-                          })
-                          .catch((error) => {
-                            // Failure code
-                            console.log(error);
-                          });
-                      }, 500)
+                      
 
                     })
                     .catch((error) => {
                       // Failure code
                       console.log(error);
                     });
+                  setTimeout(() => {
+                    BleManager.startNotification(pId,i.service, i.characteristic, data).then((res) => {
+                      console.log('Started notification on ' + pId);
+                      console.log(res)
+        
+                    }).catch((error) => {
+                      console.log('Notification error', error);
+                    });
+                  }, 200);
+
+
+
+
                 }
 
               })
@@ -262,30 +269,7 @@ export default class Demo extends Component {
 
 
 
-              // setTimeout(() => {
-              //   BleManager.startNotification(peripheral.id, service, bakeCharacteristic).then(() => {
-              //     console.log('Started notification on ' + peripheral.id);
-              //     setTimeout(() => {
-              //       BleManager.write(peripheral.id, service, crustCharacteristic, [0]).then(() => {
-              //         console.log('Writed NORMAL crust');
-              //         BleManager.write(peripheral.id, service, bakeCharacteristic, [1,95]).then(() => {
-              //           console.log('Writed 351 temperature, the pizza should be BAKED');
-              //           /*
-              //           var PizzaBakeResult = {
-              //             HALF_BAKED: 0,
-              //             BAKED:      1,
-              //             CRISPY:     2,
-              //             BURNT:      3,
-              //             ON_FIRE:    4
-              //           };*/
-              //         });
-              //       });
-
-              //     }, 500);
-              //   }).catch((error) => {
-              //     console.log('Notification error', error);
-              //   });
-              // }, 200);
+              
             });
 
           }, 900);

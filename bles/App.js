@@ -1,58 +1,70 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
+import { StackNavigator } from 'react-navigation';
+import Home from './src/views/login/login'
+//源码分析  
+//引入
+//首页 WEB、、NAMTIVE  //删除web
+import  Router  from './src/router/router';
+//const getOptions = title => (
+//	
+//	
+//	{
+//	//获取设设置title
+//title,
+//headerStyle: {
+//  backgroundColor: 'white',
+//  borderBottomColor:'white'
+//  
+//},
+//headerTintColor: 'white',
+//});
 
-import React, { Component } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
-
-type Props = {};
-export default class App extends Component<Props> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit App.js
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
-      </View>
-    );
-  }
+function getOptions(title){ //改写getOptions 函数 // 同时应可同台设置
+	if(title=='首页'){
+		return {
+			//获取设设置title
+		  title,
+		  headerStyle: {
+		    backgroundColor: 'white',
+		    borderBottomColor:'white'
+		  },
+		  headerTintColor: 'white',
+		}
+	}else{
+		return {
+	//获取设设置title
+		  title,
+		  headerStyle: {
+		    backgroundColor: '#0A9DC7',
+		  },
+		  headerTintColor: 'white',
+		}
+	}
 }
+const scenes = {
+  // Home: {
+  //   screen: Home,
+  //   //模板引入
+  //   navigationOptions: getOptions('首页'),
+  //   //header样式
+  // },
+  // native: {
+  //   screen: RnIndex,
+  //   navigationOptions: getOptions('Antm React Native'),
+  //   mode:'modal'
+  // },
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
+Router.map((component) => {
+  const Module = component.module.default;
+  scenes[component.title] = {
+    screen: Module,
+    navigationOptions: getOptions(component.title),
+    mode:'card',
+    headerMode:'screen'
+  };
 });
+
+const App = StackNavigator(scenes);
+
+export default App;

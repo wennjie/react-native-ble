@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -38,6 +37,8 @@
 		6A2A2DFD4820408794F81A39 /* libBleManager.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 36827B3F4D9B4D3897ACF88D /* libBleManager.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
+		E976BAC0EBC640A8BB58A795 /* libRCTWeChat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B6A6E906F6844929AA538CAA /* libRCTWeChat.a */; };
+		6ACB6535B411499785E7C0E6 /* RCTWeChatTests.xctest in Resources */ = {isa = PBXBuildFile; fileRef = 515902EC42CC41DDBB431C0E /* RCTWeChatTests.xctest */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -352,6 +353,9 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		ADD3242DBE9440C291FAF373 /* BleManager.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = BleManager.xcodeproj; path = "../node_modules/react-native-ble-manager/ios/BleManager.xcodeproj"; sourceTree = "<group>"; };
+		36DEDAE7DB1644D9AF052E2C /* RCTWeChat.xcodeproj */ = {isa = PBXFileReference; name = "RCTWeChat.xcodeproj"; path = "../node_modules/react-native-wechat/ios/RCTWeChat.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		B6A6E906F6844929AA538CAA /* libRCTWeChat.a */ = {isa = PBXFileReference; name = "libRCTWeChat.a"; path = "libRCTWeChat.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		515902EC42CC41DDBB431C0E /* RCTWeChatTests.xctest */ = {isa = PBXFileReference; name = "RCTWeChatTests.xctest"; path = "RCTWeChatTests.xctest"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.cfbundle; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -381,6 +385,8 @@
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				6A2A2DFD4820408794F81A39 /* libBleManager.a in Frameworks */,
+				E976BAC0EBC640A8BB58A795 /* libRCTWeChat.a in Frameworks */,
+				6ACB6535B411499785E7C0E6 /* RCTWeChatTests.xctest in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -567,6 +573,7 @@
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
 				ADD3242DBE9440C291FAF373 /* BleManager.xcodeproj */,
+				36DEDAE7DB1644D9AF052E2C /* RCTWeChat.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1216,13 +1223,13 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
+					"$(SRCROOT)/../node_modules/react-native-wechat/ios",
 				);
 				INFOPLIST_FILE = blesTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1241,13 +1248,13 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
+					"$(SRCROOT)/../node_modules/react-native-wechat/ios",
 				);
 				INFOPLIST_FILE = blesTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1268,6 +1275,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
+					"$(SRCROOT)/../node_modules/react-native-wechat/ios",
 				);
 				INFOPLIST_FILE = bles/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1291,6 +1299,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
+					"$(SRCROOT)/../node_modules/react-native-wechat/ios",
 				);
 				INFOPLIST_FILE = bles/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1320,12 +1329,12 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
+					"$(SRCROOT)/../node_modules/react-native-wechat/ios",
 				);
 				INFOPLIST_FILE = "bles-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1354,12 +1363,12 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-ble-manager/ios",
+					"$(SRCROOT)/../node_modules/react-native-wechat/ios",
 				);
 				INFOPLIST_FILE = "bles-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1388,7 +1397,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.bles-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1413,7 +1421,6 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.bles-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -5,7 +5,6 @@ import { Button, List } from 'antd-mobile';
 const Item = List.Item;
 
 const Brief = Item.Brief;
-
 export default class Login extends Component {
     constructor(props) {
         super(props)
@@ -22,8 +21,12 @@ export default class Login extends Component {
             height: ''
         }
     }
+
+
     openSetting(info) {
-        const { navigate } = this.props.navigation;
+        const navigator  = this.props.navigator;
+
+        
         let title = ''
         switch (info) {
             case '基本状态': title = 'basicSetting'
@@ -34,7 +37,10 @@ export default class Login extends Component {
                 break;
 
         }
-        navigate(title);
+        navigator.push({
+            screen: title,
+            title: title,
+        });
 
     }
     render() {
@@ -119,7 +125,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 30,
-        marginTop:30
+        marginTop: 30
     }
 
 

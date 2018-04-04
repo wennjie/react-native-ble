@@ -10,13 +10,13 @@ registerScreens();
 // this will start our app
 Navigation.startSingleScreenApp({
   screen: {
-    screen: 'Login', // unique ID registered with Navigation.registerScreen
+    screen: 'Home', // unique ID registered with Navigation.registerScreen
     title: 'Welcome', // title of the screen as appears in the nav bar (optional)
     navigatorStyle: {
-      navBarHidden: false,
-      tabBarBackgroundColor: '#003a66',
-      navBarBackgroundColor: '#003a66',
-      navBarBlur: true,
+      // navBarHidden: true,
+      // tabBarBackgroundColor: '#003a66',
+      // navBarBackgroundColor: '#003a66',
+      // navBarBlur: true,
     }, // override the navigator style for the screen, see "Styling the navigator" below (optional)
     navigatorButtons: {} // override the nav buttons for the screen, see "Adding buttons to the navigator" below (optional)
   },
@@ -33,7 +33,9 @@ Navigation.startSingleScreenApp({
     navigationBarColor: '#003a66',
     navBarBackgroundColor: '#003a66',
     statusBarColor: '#002b4c',
-    statusBarHidden: true,
+    statusBarHidden: false,
+    navBarHidden: false,
+    hideBackButtonTitle:true
   },
   // drawer: {
   //   left: {

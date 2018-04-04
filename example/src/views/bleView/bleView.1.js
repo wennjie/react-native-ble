@@ -19,13 +19,17 @@ import {
 import BleManager from 'react-native-ble-manager';
 import { stringToBytes ,bytesToString} from 'convert-string';
 
+console.log(NativeModules)
+console.log(BleManager)
 
 
 const window = Dimensions.get('window');
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
 
 const BleManagerModule = NativeModules.BleManager;
+console.log(BleManagerModule)
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
+console.log(bleManagerEmitter)
 
 export default class BleView extends Component {
   constructor() {
@@ -56,7 +60,7 @@ export default class BleView extends Component {
     })
     .catch((error) => {
       // Failure code
-      console.log('The user refuse to enable bluetooth');
+      console.error(error)
     });
 
 

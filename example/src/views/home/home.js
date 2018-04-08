@@ -89,7 +89,7 @@ export default class Login extends Component {
 
         }
         navigator.push({
-            screen: title,
+            screen: 'index',
             title: title,
         });
 

@@ -5,8 +5,10 @@ import Home from '../views/home/home'
 import bleView from '../views/bleView/bleView'
 import basicSetting from '../views/setting/basicSetting'
 import locationSetting from '../views/setting/locationSetting'
+import index from '../index'
 
 export function registerScreens() {
+  Navigation.registerComponent('index', () => index);
   Navigation.registerComponent('Login', () => Login);
   Navigation.registerComponent('Home', () => Home);
   Navigation.registerComponent('bleView', () => bleView);

@@ -136,10 +136,10 @@ export default class BleView extends Component {
     this.startScan()
 
 
-    setTimeout(()=>{
-      console.log('断开去')
-      this.stopScan()
-    },5000)
+    // setTimeout(()=>{
+    //   console.log('断开去')
+    //   this.stopScan()
+    // },5000)
   }
   startScan() { //开始搜索蓝牙
     if (!this.state.scanning) {

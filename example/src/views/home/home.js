@@ -80,16 +80,16 @@ export default class Login extends Component {
         const navigator = this.props.navigator;
         let title = ''
         switch (info) {
-            case '基本状态': title = 'basicSetting'
+            case '基本状态': title = 'index'
                 break;
-            case '定位状态': title = 'locationSetting'
+            case '定位状态': title = 'index'
                 break;
             case '': title = 'bleView'
                 break;
 
         }
         navigator.push({
-            screen: 'index',
+            screen: title,
             title: title,
         });
 

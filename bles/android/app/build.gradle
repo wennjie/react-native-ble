@@ -138,6 +138,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-navigation')
     compile project(':react-native-wechat')
     compile project(':react-native-ble-manager')
     compile fileTree(dir: "libs", include: ["*.jar"])

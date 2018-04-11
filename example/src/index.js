@@ -112,7 +112,7 @@ export default class App extends Component {
      //接收到新数据
     handleUpdateValue=(data)=>{
         //ios接收到的是小写的16进制，android接收的是大写的16进制，统一转化为大写16进制
-        let value = data.value;	
+        let value = data.value.toUpperCase();	
         this.bluetoothReceiveData.push(value);			
         console.log('BluetoothUpdateValue', value);
         this.setState({receiveData:this.bluetoothReceiveData.join('')})
@@ -267,7 +267,6 @@ export default class App extends Component {
                     <Text style={{marginLeft:50,color:"red"}}>{data.isConnecting?'连接中...':''}</Text>
                 </View>
                 <Text>{data.id}</Text>
-                <Text>{data.rssi}</Text>
                
             </TouchableOpacity>
         );
@@ -423,5 +422,3 @@ const styles = StyleSheet.create({
         flex:1,
 	},
 })
-
-

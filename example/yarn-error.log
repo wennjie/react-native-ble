@@ -2,7 +2,7 @@ Arguments:
   /usr/local/Cellar/node/9.11.1/bin/node /usr/local/Cellar/yarn/1.5.1_1/libexec/bin/yarn.js start
 
 PATH: 
-  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Server.app/Contents/ServerRoot/usr/bin:/Applications/Server.app/Contents/ServerRoot/usr/sbin
+  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Server.app/Contents/ServerRoot/usr/bin:/Applications/Server.app/Contents/ServerRoot/usr/sbin:/Users/wenjie/Library/Android/sdk/tools:/Users/wenjie/Library/Android/sdk/platform-tools:/Users/wenjie/Library/Android/sdk/tools:/Users/wenjie/Library/Android/sdk/platform-tools
 
 Yarn version: 
   1.5.1

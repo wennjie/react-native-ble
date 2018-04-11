@@ -4,7 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
-  TouchableWithoutFeedback,
+  TouchableHighlight,
   NativeAppEventEmitter,
   NativeEventEmitter,
   NativeModules,
@@ -14,13 +14,12 @@ import {
   ScrollView,
   AppState,
   Dimensions,
-  Alert,
-  RefreshControl,
-  DeviceEventEmitter
+  Alert
 } from 'react-native';
-import { Toast } from 'antd-mobile';
 import BleManager from 'react-native-ble-manager';
 import { stringToBytes ,bytesToString} from 'convert-string';
+
+
 
 const window = Dimensions.get('window');
 const ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
@@ -39,7 +38,7 @@ export default class BleView extends Component {
       infos: '',
       macId: ''
     }
-    this.peripheralId=''
+
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);
     this.handleUpdateValueForCharacteristic = this.handleUpdateValueForCharacteristic.bind(this);
@@ -49,7 +48,15 @@ export default class BleView extends Component {
   }
 
   componentDidMount() {
+    // BleManager.enableBluetooth()
+
+
     AppState.addEventListener('change', this.handleAppStateChange);
+
+    BleManager.start({ showAlert: false }).then((e) => {
+      console.log('蓝牙服务打开???')
+    })
+
     this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
     this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan);
     this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
@@ -104,7 +111,6 @@ export default class BleView extends Component {
   }
 
   handleUpdateValueForCharacteristic(data) { //监听返回的值
-    console.log(data)
     // console.log('来信的数据 ' + data.peripheral + ' 特征 ' + data.characteristic, data.value);
     console.log(bytesToString(data.value))
   }
@@ -112,18 +118,6 @@ export default class BleView extends Component {
   handleStopScan() {
     console.log('搜索结束');
     this.setState({ scanning: false });
-  }
-  returnUUIDS(e){
-    
-
-    setTimeout(()=>{
-      DeviceEventEmitter.emit('RETURNUUIDS',e); //发监听
-      this.props.navigator.pop()
-    },3000)
-     
-  }
-  _onRefresh(){
-    this.startScan()
   }
   stopServer() {
     BleManager.disconnect(this.state.macId)
@@ -136,11 +130,9 @@ export default class BleView extends Component {
         console.log(error);
       });
   }
-  stopScan(){
-
-  }
   startScan() {
-    //搜索蓝牙
+
+
     if (!this.state.scanning) {
       this.setState({ peripherals: new Map() });
       BleManager.scan([], 5, true).then((results) => {
@@ -171,20 +163,18 @@ export default class BleView extends Component {
       this.setState({ peripherals })
     }
   }
-  disconnect(id){
-    BleManager.disconnect(id);
-}  
-  checkItem(peripheral){ //点击是否有蓝牙在连接
-    if(this.isCheckItem) return  //有的话
-    this.test(peripheral)
-  }
+
   test(peripheral) {
+    console.log(`点击的设备` + peripheral)
+    this.setState({
+      info: JSON.stringify(peripheral),
+      macId: peripheral.id
+    })
 
     if (peripheral) {
       if (peripheral.connected) {
-        this.disconnect(peripheral.id)
+        BleManager.disconnect(peripheral.id);
       } else {
-        this.isCheckItem=true
         BleManager.connect(peripheral.id).then(() => {//连接蓝牙
           let peripherals = this.state.peripherals;
           let p = peripherals.get(peripheral.id);
@@ -193,10 +183,9 @@ export default class BleView extends Component {
             peripherals.set(peripheral.id, p);
             this.setState({ peripherals });
           }
-          this.isCheckItem=false
           console.log('连接到' + peripheral.id);
-          this.returnUUIDS(peripheral)
-          return 
+
+
           setTimeout(() => {
 
             /* Test read current RSSI value
@@ -211,48 +200,19 @@ export default class BleView extends Component {
             // Test using bleno's pizza example
             // https://github.com/sandeepmistry/bleno/tree/master/examples/pizza
             BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
-           
-        
               console.log(`搜索到的服务`);
               console.log(peripheralInfo)
-              function requestZore(place){
-                let a=0
-              a |= (1 << place)
-                return a
-                
-            }
-        
-            function int2bytes(v){
-                
-                let i0 = (v>>24)&0xff
-                let i1=(v>>16)&0xff
-                let i2=(v>>8)&0xff
-                let i3 = (v>>0)&0xff
-                return [i3,i0,i1,i2]
 
-            }
-            function bytesToint32(v){
-             return   ((v[0]&0xff) <<0) | ((v[1]&0xff) <<16) | ((v[2]&0xff) <<8) | ((v[3]&0xff) <<24)
-            }
 
-           console.log( bytesToint32(int2bytes(8)))
-            let data=[...stringToBytes('#'),...int2bytes(requestZore(3)),...int2bytes(0),...int2bytes(0),...stringToBytes('@')]
-
+              let int32 = new Int32Array(14)
+              int32[0] = 10
+              let data = [...stringToBytes('#'),...int32,...stringToBytes('@')]
+              console.log(data)
               let characteristics = peripheralInfo.characteristics  //特征
               
               let pId = peripheralInfo.id
               characteristics.map((i) => {
-                if (i.characteristic == 'fff6') {
-                  
-                  BleManager.write(pId,i.service, i.characteristic,data)
-                  .then(() => {
-                      console.log('Write success: ',data.toString());
-                      
-                  })
-                  .catch((error) => {
-                      console.log('Write  failed: ',data);
-                      
-                  });
+                if (i.characteristic == '1111') {
         
                   BleManager.startNotification(pId,i.service, i.characteristic).then((res) => {
                     console.log('Started notification on ' + pId);
@@ -262,6 +222,8 @@ export default class BleView extends Component {
                     console.log('Notification error', error);
                   });
                 
+
+
 
 
                 }
@@ -283,39 +245,28 @@ export default class BleView extends Component {
   }
 
   render() {
-    const list = Array.from(this.state.peripherals.values()); //获取到蓝牙列表
+    const list = Array.from(this.state.peripherals.values());
     const dataSource = ds.cloneWithRows(list);
+
+
     return (
       <View style={styles.container}>
-        <ScrollView style={styles.scroll}
-          refreshControl={(
-            <RefreshControl
-              refreshing={this.state.scanning}
-              onRefresh={this._onRefresh.bind(this)}
-              colors={['#ff0000', '#00ff00', '#0000ff']}
-              progressBackgroundColor="#ffff00"
-            />
-          )}>
-          {/* {(list.length == 0) &&
+        <TouchableHighlight style={{ marginTop: 10, margin: 10, padding: 10, backgroundColor: '#ccc' }} onPress={() => this.startScan()}>
+          <Text>搜索蓝牙 ({this.state.scanning ? 'on' : 'off'})</Text>
+        </TouchableHighlight>
+        <TouchableHighlight style={{ marginTop: 0, margin: 10, padding: 10, backgroundColor: '#ccc' }} onPress={() => this.retrieveConnected()}>
+          <Text>查看已连接蓝牙</Text>
+        </TouchableHighlight>
+        <TouchableHighlight style={{ marginTop: 0, margin: 10, padding: 10, backgroundColor: '#ccc' }} onPress={() => this.stopServer()}>
+          <Text>断开连接</Text>
+        </TouchableHighlight>
+        <ScrollView style={styles.scroll}>
+          {(list.length == 0) &&
             <View style={{ flex: 1, margin: 20 }}>
-              <Text style={{ textAlign: 'center' }}>下拉搜索蓝牙设备</Text>
+              <Text style={{ textAlign: 'center' }}>无设备...？</Text>
             </View>
-          } */}
-
-          {
-            list.map((item,index)=>{
-              const color = item.connected ? 'green' : '#fff';
-              return(
-                <TouchableWithoutFeedback onPress={() => this.test(item)} key={index}>
-                <View style={[styles.row, { backgroundColor: color }]}>
-                  <Text style={{ fontSize: 12, textAlign: 'center', color: '#000000', padding: 5 }}>{item.name}</Text>
-                  <Text style={{ fontSize: 8, textAlign: 'center', color: '#333333', padding: 5 }}>{item.id}</Text>
-                </View>
-              </TouchableWithoutFeedback>
-              )
-            })
           }
-          {/* <ListView
+          <ListView
             enableEmptySections={true}
             dataSource={dataSource}
             renderRow={(item) => {
@@ -323,13 +274,16 @@ export default class BleView extends Component {
               return (
                 <TouchableHighlight onPress={() => this.test(item)}>
                   <View style={[styles.row, { backgroundColor: color }]}>
-                    <Text style={{ fontSize: 12, textAlign: 'center', color: '#000000', padding: 10 }}>{item.name}</Text>
+                    <Text style={{ fontSize: 12, textAlign: 'center', color: '#333333', padding: 10 }}>{item.name}</Text>
                     <Text style={{ fontSize: 8, textAlign: 'center', color: '#333333', padding: 10 }}>{item.id}</Text>
                   </View>
                 </TouchableHighlight>
               );
             }}
-          /> */}
+          />
+        </ScrollView>
+        <ScrollView>
+          <Text>{this.state.info} </Text>
         </ScrollView>
       </View>
     );
@@ -345,9 +299,10 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flex: 1,
-    backgroundColor: '#f0f0f0'
+    backgroundColor: '#f0f0f0',
+    margin: 10,
   },
   row: {
-    margin: 5
+    margin: 10
   },
 });

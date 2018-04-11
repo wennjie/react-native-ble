@@ -8,6 +8,7 @@
     "xcode": "open ios/example.xcodeproj",
     "android": "cd android && ./gradlew installDebug",
     "e2e": "detox test --configuration ios.sim.debug",
+    "debug":"open rndebugger://set-debugger-loc?host=localhost&port=8081",
     "e2e-release": "detox test --configuration ios.sim.release"
   },
   "dependencies": {

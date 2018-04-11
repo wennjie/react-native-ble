@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { AppRegistry, TouchableWithoutFeedback, StatusBar, View, Text, StyleSheet, Image, ToastAndroid, Alert,NativeEventEmitter,NativeModules, } from 'react-native';
+import { AppRegistry, Platform, TouchableWithoutFeedback, DeviceEventEmitter, StatusBar, View, Text, StyleSheet, Image, ToastAndroid, Alert, NativeEventEmitter, NativeModules, } from 'react-native';
 import { Button, List } from 'antd-mobile';
 import BleManager from 'react-native-ble-manager';
+import Utils from '../../utils'
+const Util = new Utils()
 const BleManagerModule = NativeModules.BleManager;
 const bleManagerEmitter = new NativeEventEmitter(BleManagerModule);
-
 const Item = List.Item;
-const Brief = Item.Brief;
+
 export default class Login extends Component {
     constructor(props) {
         super(props)
@@ -20,77 +21,120 @@ export default class Login extends Component {
             accountState: '',
             lat: '',
             lng: '',
-            height: ''
+            height: '',
+            res: '蓝牙',
+            ress: "蓝牙",
+            judgePattern:{}
         }
+        this.arr = []
     }
-    componentDidMount(){
-        console.log('home1')
-    }
-    componentWillMount() {
-      
-        console.log('home')
-        BleManager.enableBluetooth().then(() => { //Android only
-            //TODO ,启用成功
-            BleManager.start({ showAlert: false }).then((e) => {
-                console.log('蓝牙服务打开???')
+    componentDidMount() {
+        let ag = [35, 0, 0, 0, 8, 0, 0, 0, 24, 0, 0, 0, 24, 36, 71, 80, 71, 71, 65, 44, 44, 44, 44, 44, 44, 48, 44, 44, 44, 44, 44, 44, 44, 44, 42, 54, 54, 64]
+        // console.log(Util.judgePattern(ag))
+        BleManager.start({ showAlert: true }) //开启服务
+        this.listener = DeviceEventEmitter.addListener('RETURNUUIDS', (peripheral) => {
+            console.log(peripheral)
+            BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
+                console.log(`搜索到的服务`);
+                console.log(peripheralInfo)
+
+                let characteristics = peripheralInfo.characteristics  //特征
+
+                let pId = peripheralInfo.id
+                let data = Util.Bytes2Data(3),data1=Util.Bytes2Data(4)
+
+                characteristics.map((i) => {
+                    console.log(i)
+                    if (i.characteristic.toLowerCase() == 'fff6') {
+                        this.startNotification(pId, i.service, i.characteristic)//开启监听
+
+                        //请求数据接口
+
+                        setInterval(() => {
+                           this.writeWithoutResponse(pId, i.service, i.characteristic,data)
+
+                        }, 1000)
+                        // setInterval(() => {
+                        //     this.writeWithoutResponse(pId, i.service, i.characteristic,data1)
+                            
+                        // }, 8000)
+
+                    }
+
                 })
-        }).catch((error) => {
-            //TODO,启用失败
-        });
-        
-
-        return 
-        this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
-    this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan);
-    this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
-    this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic);
 
 
 
-        if (Platform.OS === 'android' && Platform.Version >= 23) {
-            PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION).then((result) => {
-              if (result) {
-                console.log("安卓权限开启  OK");
-              } else {
-                PermissionsAndroid.requestPermission(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION).then((result) => {
-                  if (result) {
-                    console.log("User accept");
-                  } else {
-                    console.log("User refuse");
-                  }
-                });
-              }
+
+
             });
-          }
+        });
+        this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
+        this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic.bind(this));
+
+
     }
     componentWillUnmount() {
-       console.log('路由切换')
-      }
-    handleAppStateChange(nextAppState) {//切换后台后 前台
-        if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
-          console.log('App已经到了前台!')
-          BleManager.getConnectedPeripherals([]).then((peripheralsArray) => {
-            console.log('连接外围设备: ' + peripheralsArray.length + '个');
-          });
-        }
-        this.setState({ appState: nextAppState });
-      }
+        console.log('路由切换')
+    }
 
+    handleDisconnectedPeripheral(data) {
+
+        console.log('断开了 ' + data.peripheral);
+    }
+    handleUpdateValueForCharacteristic(data) { //监听返回的值
+        let datas = data.value
+        datas.map((i) => {
+            switch (i) {
+                case 35:
+                    this.arr = []
+                    this.arr.push(i)
+                    break;
+                case 64:
+                    this.arr.push(i)
+                    console.log(Util.judgePattern(this.arr))
+
+                    this.setState({
+                        judgePattern: Util.judgePattern(this.arr)
+                    })
+                    break;
+                default:
+                    this.arr.push(i)
+            }
+        })
+    }
+
+    handleStopScan() {
+        console.log('搜索结束');
+        this.setState({ scanning: false });
+    }
+
+    startNotification(pId, service, characteristic){
+        BleManager.startNotification(pId, service, characteristic).then((res) => {
+            console.log('监听开启成功')
+
+        }).catch((error) => {
+            console.log('监听开启失败');
+        });
+    }
+    writeWithoutResponse(pId, service, characteristic,data){
+        BleManager.writeWithoutResponse(pId, service, characteristic, data)
+    }
     openSetting(info) {
         const navigator = this.props.navigator;
-        let title = ''
+        let title = '', screen = ''
         switch (info) {
-            case '基本状态': title = 'index'
+            case '基本状态': title = 'index'; screen = ''
                 break;
-            case '定位状态': title = 'index'
+            case '定位状态': title = 'index'; screen = ''
                 break;
-            case '': title = 'bleView'
+            case '': title = 'bleView'; screen = '蓝牙选择'
                 break;
 
         }
         navigator.push({
             screen: title,
-            title: title,
+            title: screen,
         });
 
     }
@@ -106,19 +150,25 @@ export default class Login extends Component {
             </TouchableWithoutFeedback>
         )
         const State = this.state
+        console.log(State.judgePattern)
         return (
             <View style={styles.view}>
-                
+
                 <TouchableWithoutFeedback onPress={() => { this.openSetting('') }}>
                     <View style={styles.header} >
-                        <Image
+                        {/* <Image
                             style={styles.headerImage}
                             source={{
                                 uri: 'http://pic.sc.chinaz.com/files/pic/pic9/201803/zzpic10964.jpg',
                                 cache: 'force-cache'
                             }}
-                        />
-                        <Text  >图片文字1</Text>
+                        /> */}
+                        <Text  >{
+                            this.state.res
+                        }</Text>
+                        <Text  >{
+                            this.state.ress
+                        }</Text>
                     </View>
                 </TouchableWithoutFeedback>
                 <View >
@@ -128,12 +178,12 @@ export default class Login extends Component {
                         <Item extra={State.channel}  >通道号</Item>
                     </List>
                     <List renderHeader={() => ListHeader('定位状态')}>
-                        <Item extra={State.levelOfAccuracy}>水平精度</Item>
-                        <Item extra={State.rtkState}  >RTK状态</Item>
-                        <Item extra={State.accountState}  >结算状态</Item>
-                        <Item extra={State.lat}  >经度</Item>
-                        <Item extra={State.lng}  >纬度</Item>
-                        <Item extra={State.height}  >高程</Item>
+                        <Item extra={State.judgePattern.hdop}>水平精度</Item>
+                        <Item extra={State.judgePattern.rtk}  >RTK状态</Item>
+                        <Item extra={State.judgePattern.satellites}  >结算状态</Item>
+                        <Item extra={State.judgePattern.lat}  >经度</Item>
+                        <Item extra={State.judgePattern.lon}  >纬度</Item>
+                        <Item extra={State.judgePattern.alt}  >高程</Item>
                     </List>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'center', position: 'absolute', bottom: 0, width: 375 }}>

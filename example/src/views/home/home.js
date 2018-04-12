@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { AppRegistry, Platform, TouchableWithoutFeedback, DeviceEventEmitter, StatusBar, View, Text, StyleSheet, Image, ToastAndroid, Alert, NativeEventEmitter, NativeModules, } from 'react-native';
-import { Button, List ,Toast } from 'antd-mobile';
+import { Button, List, Toast } from 'antd-mobile';
 import BleManager from 'react-native-ble-manager';
 import Utils from '../../utils'
 const Util = new Utils()
@@ -33,16 +33,9 @@ export default class Login extends Component {
             this.bleService = {}
     }
     componentDidMount() {
-        let ag = [35, 0, 0, 0, 8, 0, 0, 0, 24, 0, 0, 0, 24, 36, 71, 80, 71, 71, 65, 44, 44, 44, 44, 44, 44, 48, 44, 44, 44, 44, 44, 44, 44, 44, 42, 54, 54, 64]
-        console.log(Util.judgePattern(ag))
-        // this.writeWithoutResponse(pId, services, characteristics, Util.Bytes2Data(2, [6]))
-                console.log(Util.Bytes2Data(2,Util.String2byte('6')))
         BleManager.start({ showAlert: true }) //开启服务
         this.listener = DeviceEventEmitter.addListener('RETURNUUIDS', (peripheral) => {
-            console.log(peripheral)
             BleManager.retrieveServices(peripheral.id).then((peripheralInfo) => {
-                console.log(`搜索到的服务`);
-                // console.log(peripheralInfo)
 
                 let characteristics = peripheralInfo.characteristics  //特征
 
@@ -58,9 +51,7 @@ export default class Login extends Component {
                         //请求数据接口
                         // return 
                         setInterval(() => {
-                //             this.writeWithoutResponse(pId, services, characteristics, Util.Bytes2Data(2, [6]))
-                // console.log(Util.Bytes2Data(2,[6]))
-                // return 
+
                             setTimeout(() => {
                                 this.writeWithoutResponse(pId, i.service, i.characteristic, Util.Bytes2Data(4))
                             }, 100)
@@ -73,9 +64,7 @@ export default class Login extends Component {
                             this.writeWithoutResponse(pId, i.service, i.characteristic, Util.Bytes2Data(3))
 
                         }, 2000)
-                        // setInterval(() => {
-                        //     
-                        // }, 8000)
+
 
                     }
 
@@ -99,6 +88,7 @@ export default class Login extends Component {
     handleDisconnectedPeripheral(data) {
 
         console.log('断开了 ' + data.peripheral);
+        Alert.alert('蓝牙断开了')
     }
     handleUpdateValueForCharacteristic(data) { //监听返回的值
         let datas = data.value
@@ -110,9 +100,6 @@ export default class Login extends Component {
                     break;
                 case 64:
                     this.arr.push(i)
-
-
-
                     let res = Util.judgePattern(this.arr)
 
                     console.log(res)
@@ -142,11 +129,6 @@ export default class Login extends Component {
         })
     }
 
-    handleStopScan() {
-        console.log('搜索结束');
-        this.setState({ scanning: false });
-    }
-
     startNotification(pId, service, characteristic) {
         BleManager.startNotification(pId, service, characteristic).then((res) => {
             console.log('监听开启成功')
@@ -156,33 +138,30 @@ export default class Login extends Component {
         });
     }
     writeWithoutResponse(pId, service, characteristic, data) {
-        BleManager.writeWithoutResponse(pId, service, characteristic, data).then((res)=>{
+        BleManager.writeWithoutResponse(pId, service, characteristic, data).then((res) => {
             console.log(res)
         })
     }
     openSetting(info) {
-        console.log(info)
         let service, { pId, services, characteristics } = this.bleService
         const navigator = this.props.navigator;
         let title = '', screen = ''
+
         switch (info) {
             case '基本状态': title = '设备模式'; screen = 'basicSetting'
-                if (JSON.stringify(service) == "{}") {
-                    alert('未连接')
+                if (pId == undefined || pId == null) {
+                    Alert.alert('未连接蓝牙')
                     return
                 }
                 break;
             case '定位状态': title = '定位设置'; screen = 'locationSetting'
-            //信道设置
-            
-            // this.writeWithoutResponse(pId, services, characteristics, Util.Bytes2Data(4))
-   
-            if (JSON.stringify(service) == "{}") {
-                    alert('未连接')
+
+                if (pId == undefined || pId == null) {
+                    Alert.alert('未连接蓝牙')
                     return
                 }
                 if (this.state.GGA.rtk != 4) {
-                    alert('数据不正常')
+                    Alert.alert('数据不正常,请等待')
                     return
                 }
                 break;
@@ -197,8 +176,8 @@ export default class Login extends Component {
             title,
             passProps: {
                 service,
-                channel:this.state.channel,
-                pattern:this.state.pattern
+                channel: this.state.channel,
+                pattern: this.state.pattern
             }
         });
 
@@ -228,9 +207,7 @@ export default class Login extends Component {
                                 cache: 'force-cache'
                             }}
                         />
-                        {/* <Text  >{
-                            this.state.res
-                        }</Text> */}
+
                         <Text  >{
                             this.state.ress
                         }</Text>

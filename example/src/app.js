@@ -13,7 +13,7 @@ Navigation.startSingleScreenApp({
     screen: 'Home', // unique ID registered with Navigation.registerScreen
     title: 'Welcome', // title of the screen as appears in the nav bar (optional)
     navigatorStyle: {
-      // navBarHidden: true,
+      navBarHidden: true,
       // tabBarBackgroundColor: '#003a66',
       // navBarBackgroundColor: '#003a66',
       // navBarBlur: true,

@@ -42,7 +42,6 @@ export default class BleView extends Component {
     this.peripheralId=''
     this.handleDiscoverPeripheral = this.handleDiscoverPeripheral.bind(this);
     this.handleStopScan = this.handleStopScan.bind(this);
-    this.handleUpdateValueForCharacteristic = this.handleUpdateValueForCharacteristic.bind(this);
     this.handleDisconnectedPeripheral = this.handleDisconnectedPeripheral.bind(this);
     this.handleAppStateChange = this.handleAppStateChange.bind(this);
     this.stopServer = this.stopServer.bind(this)
@@ -53,10 +52,7 @@ export default class BleView extends Component {
     this.handlerDiscover = bleManagerEmitter.addListener('BleManagerDiscoverPeripheral', this.handleDiscoverPeripheral);
     this.handlerStop = bleManagerEmitter.addListener('BleManagerStopScan', this.handleStopScan);
     this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
-    this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic);
-
-
-
+ 
     if (Platform.OS === 'android' && Platform.Version >= 23) {
       PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_COARSE_LOCATION).then((result) => {
         if (result) {
@@ -89,7 +85,7 @@ export default class BleView extends Component {
     this.handlerDiscover.remove();
     this.handlerStop.remove();
     this.handlerDisconnect.remove();
-    this.handlerUpdate.remove();
+   
   }
 
   handleDisconnectedPeripheral(data) {
@@ -102,11 +98,13 @@ export default class BleView extends Component {
     }
     console.log('断开了 ' + data.peripheral);
   }
-
-  handleUpdateValueForCharacteristic(data) { //监听返回的值
-    console.log(data)
-    // console.log('来信的数据 ' + data.peripheral + ' 特征 ' + data.characteristic, data.value);
-    console.log(bytesToString(data.value))
+  handleDiscoverPeripheral(peripheral) {
+    var peripherals = this.state.peripherals;
+    if (!peripherals.has(peripheral.id)) {
+      console.log('获取到蓝牙设备', peripheral);
+      peripherals.set(peripheral.id, peripheral);
+      this.setState({ peripherals })
+    }
   }
 
   handleStopScan() {
@@ -163,14 +161,7 @@ export default class BleView extends Component {
     });
   }
 
-  handleDiscoverPeripheral(peripheral) {
-    var peripherals = this.state.peripherals;
-    if (!peripherals.has(peripheral.id)) {
-      console.log('获取到蓝牙设备', peripheral);
-      peripherals.set(peripheral.id, peripheral);
-      this.setState({ peripherals })
-    }
-  }
+  
   disconnect(id){
     BleManager.disconnect(id);
 }  

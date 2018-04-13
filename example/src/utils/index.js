@@ -39,7 +39,7 @@ export default class Utils {
         //设置  基站手持杖切换  3 data [0],[1]
         //经纬度高度写入 6 data ：str s = lat + "," + lon + "," + alt + ",";
         // 信道 2 data str 类型额 0-7
-        console.log(v, bytes)
+        //console.log(v, bytes)
         if (bytes) {
 
             let len = bytes.length
@@ -58,7 +58,7 @@ export default class Utils {
         let byt32_2 = bytes.slice(5, 9)
         let int32_1 = this.Bytes2int321(byt32_1)
         let int32_2 = this.Bytes2int321(byt32_2)
-        console.log('len:' + int32_2)
+        //console.log('len:' + int32_2)
 
         let w1 = int32_1 & 0x3
 
@@ -69,12 +69,12 @@ export default class Utils {
         // translateDatas
         let bytes1 = this.translateDatas(buf)
 
-        console.log(bytes1)
+        //console.log(bytes1)
         let s = bytesToString(bytes1) //TODO  可能存在问题
 
 
-        console.log(s)
-        console.log(s.length)
+        //console.log(s)
+        //console.log(s.length)
         if (w1 == 0) { //请求模式
             switch (w2) {
                 case 1:
@@ -83,7 +83,7 @@ export default class Utils {
                 case 2: //GGA
 
                     if (int32_2 == s.length) {
-                        console.log(s)
+                        //console.log(s)
                         let s2 = s.split(',')
                         let hashMap = {}
                         let lat, lon, satellites, rtk, hdop, alt
@@ -165,33 +165,33 @@ export default class Utils {
 
             }
         } else if (w1 == 2) {  //设置模式
-            
-            let infos=''
+
+            let infos = ''
 
             switch (w2) {
                 case 1:
                     //                            Log.e("信道");
-                Toast.loading("信道发送成功，正在设置")
+                    infos = ("信道")
 
                     break;
                 case 2:
                     //                            Log.e("基站手持杖切换");
-                    Toast.loading("基站手持杖切换发送成功，正在设置");
+                    infos = ("切换");
                     break;
                 case 4:
                     //                            Log.e("rtcm数据");
-                    Toast.loading("rtcm数据发送成功，正在设置");
+                    infos = ("rtcm");
                     break;
                 case 8:
                     //                            Log.e("rtk自矫正");
-                    Toast.loading("rtk自矫正发送成功，正在设置");
+                    infos = ("rtk自矫正");
                     break;
                 case 16:
                     //                            Log.e("设置经纬度");
-                    Toast.loading("设置经纬度发送成功，正在设置");
+                    infos = ("经纬度发");
                     break;
             }
-            return { info: "", val: '' }
+            return { info: "set", val: w2 }
 
         }
 
@@ -213,7 +213,7 @@ export default class Utils {
 
     }
     translationAanEnd(bytes) { //转义
-        console.log('1' + bytes)
+        //console.log('1' + bytes)
         let len = bytes.length
         let arr = []
         bytes.map((i) => {
@@ -225,7 +225,7 @@ export default class Utils {
                 arr.push(i)
             }
         })
-        console.log(arr)
+        //console.log(arr)
         return arr
     }
     gpsToGoogler(v) {//转换经纬度HH.DD.MM格式

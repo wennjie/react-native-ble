@@ -10,7 +10,7 @@ const Item = List.Item;
 
 s = 100.1 + "," + 20.3 + "," + 1 + ","
 
-console.log(Util.Bytes2Data(2, Util.String2byte(s)))
+//console.log(Util.Bytes2Data(2, Util.String2byte(s)))
 export default class Login extends Component {
     constructor(props) {
         super(props)
@@ -29,8 +29,9 @@ export default class Login extends Component {
             ress: "蓝牙",
             GGA: {}
         }
-        this.arr = [],
-            this.bleService = {}
+        this.arr = []
+        this.bleService = {}
+        this.timer=null
     }
     componentDidMount() {
         BleManager.start({ showAlert: true }) //开启服务
@@ -43,27 +44,27 @@ export default class Login extends Component {
                 let data = Util.Bytes2Data
 
                 characteristics.map((i) => {
-                    // console.log(i)
+                    // //console.log(i)
                     if (i.characteristic.toLowerCase() == 'fff6') {
                         this.bleService = { pId, services: i.service, characteristics: i.characteristic }
                         this.startNotification(pId, i.service, i.characteristic)//开启监听
 
                         //请求数据接口
                         // return 
-                        setInterval(() => {
+                        this.timer=setInterval(() => {
 
-                            setTimeout(() => {
+                           this.outTimer= setTimeout(() => {
                                 this.writeWithoutResponse(pId, i.service, i.characteristic, Util.Bytes2Data(4))
                             }, 100)
-                            setTimeout(() => {
+                            this.outTimer1= setTimeout(() => {
                                 this.writeWithoutResponse(pId, i.service, i.characteristic, Util.Bytes2Data(2))
                             }, 200)
-                            setTimeout(() => {
+                            this.outTimer2=setTimeout(() => {
                                 this.writeWithoutResponse(pId, i.service, i.characteristic, Util.Bytes2Data(5))
                             }, 300)
                             this.writeWithoutResponse(pId, i.service, i.characteristic, Util.Bytes2Data(3))
 
-                        }, 2000)
+                        }, 1000)
 
 
                     }
@@ -76,19 +77,27 @@ export default class Login extends Component {
 
             });
         });
-        this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral);
+        this.handlerDisconnect = bleManagerEmitter.addListener('BleManagerDisconnectPeripheral', this.handleDisconnectedPeripheral.bind(this));
         this.handlerUpdate = bleManagerEmitter.addListener('BleManagerDidUpdateValueForCharacteristic', this.handleUpdateValueForCharacteristic.bind(this));
-
-
     }
     componentWillUnmount() {
-        console.log('路由切换')
+        //console.log('路由切换')
+        this.clearAll()
     }
+    clearAll(){ //清除定时及监听事件
+        clearInterval(this.timer)
+        clearTimeout(this.outTimer)
+        clearTimeout(this.outTimer1)
+        clearTimeout(this.outTimer2)
+        this.handlerDisconnect.remove();
+        this.handlerUpdate.remove();
+        
+    }
+    handleDisconnectedPeripheral(data) {//蓝牙断开,移除监听
 
-    handleDisconnectedPeripheral(data) {
-
-        console.log('断开了 ' + data.peripheral);
         Alert.alert('蓝牙断开了')
+        this.clearAll()
+
     }
     handleUpdateValueForCharacteristic(data) { //监听返回的值
         let datas = data.value
@@ -102,7 +111,7 @@ export default class Login extends Component {
                     this.arr.push(i)
                     let res = Util.judgePattern(this.arr)
 
-                    console.log(res)
+                    //console.log(res)
                     // return 
                     if (res.info == 'GGA') {
                         this.setState({
@@ -122,6 +131,9 @@ export default class Login extends Component {
                         })
                         return
                     }
+                    if(res.info == 'set'){
+                        DeviceEventEmitter.emit('setInfos',res.val)
+                    }
                     break;
                 default:
                     this.arr.push(i)
@@ -131,22 +143,21 @@ export default class Login extends Component {
 
     startNotification(pId, service, characteristic) {
         BleManager.startNotification(pId, service, characteristic).then((res) => {
-            console.log('监听开启成功')
+            //console.log('监听开启成功')
 
         }).catch((error) => {
-            console.log('监听开启失败');
+            //console.log('监听开启失败');
         });
     }
     writeWithoutResponse(pId, service, characteristic, data) {
         BleManager.writeWithoutResponse(pId, service, characteristic, data).then((res) => {
-            console.log(res)
+            //console.log(res)
         })
     }
     openSetting(info) {
-        let service, { pId, services, characteristics } = this.bleService
+        let  { pId, services, characteristics } = this.bleService
         const navigator = this.props.navigator;
         let title = '', screen = ''
-
         switch (info) {
             case '基本状态': title = '设备模式'; screen = 'basicSetting'
                 if (pId == undefined || pId == null) {
@@ -175,7 +186,7 @@ export default class Login extends Component {
             screen,
             title,
             passProps: {
-                service,
+                service:this.bleService,
                 channel: this.state.channel,
                 pattern: this.state.pattern
             }
@@ -194,7 +205,7 @@ export default class Login extends Component {
             </TouchableWithoutFeedback>
         )
         const State = this.state
-        console.log(State.GGA)
+        //console.log(State.GGA)
         return (
             <View style={styles.view}>
 

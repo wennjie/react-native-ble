@@ -23,6 +23,7 @@
     "react-native-animatable": "^1.1.0",
     "react-native-ble-manager": "^6.2.8",
     "react-native-navigation": "latest",
+    "react-native-update": "5.x",
     "react-native-wechat": "^1.9.9",
     "react-navigation": "^1.5.9",
     "typedarray": "^0.0.6",
